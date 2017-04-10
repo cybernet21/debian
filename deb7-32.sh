@@ -105,7 +105,6 @@ tar cf client.tar 1194-client.ovpn
 cp client.tar /home/vps/public_html/
 
 #restart 24 jam
-echo "0 */6 * * * root /usr/sbin/reboot" > /etc/cron.d/reboot
 echo "*/30 * * * * root /root/clearcache.sh" > /etc/cron.d/clearcache
 echo "0 1 * * * root service dropbear restart" > /etc/cron.d/dropbear
 
@@ -152,7 +151,7 @@ service ssh restart
 apt-get -y install dropbear
 sed -i 's/NO_START=1/NO_START=0/g' /etc/default/dropbear
 sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=109/g' /etc/default/dropbear
-sed -i 's/DROPBEAR_EXTRA_ARGS=/DROPBEAR_EXTRA_ARGS="-p 443 -p 80"/g' /etc/default/dropbear
+sed -i 's/DROPBEAR_EXTRA_ARGS=/DROPBEAR_EXTRA_ARGS="-p 443"/g' /etc/default/dropbear
 echo "/bin/false" >> /etc/shells
 service ssh restart
 service dropbear restart
