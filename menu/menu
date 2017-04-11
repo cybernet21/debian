@@ -169,15 +169,15 @@ echo "--------------------------------------------------"
 }
 
 clear
-echo "        >>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>"
+echo ""
 echo "        ====================================================="
 echo "        #           [SELAMAT DATANG DI VPS ARY SGDO ]       #"
 echo "        ====================================================="
 echo "        #           WhatsApp     : 085727033401             #"
 echo "        #           Facebook     : fb.com/sshpremiumsgdo    #"
-echo "        #           Pin-BBM      : yu-suf                   #"
+echo "        #           Pin-BBM      : 59D3351D                 #"
 echo "        #                                                   #"
-echo "        #                 Copyright © 2017        #"
+echo "        #                 Copyright © 2017                  #"
 echo "        ====================================================="
 echo ""
 PS3='Silahkan ketik nomor pilihan anda lalu tekan enter: '
