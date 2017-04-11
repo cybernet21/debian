@@ -32,9 +32,9 @@ echo -e "     1. No DDOS No HACKING"
 echo -e "     2. No CARDING No SPAMING"
 echo -e "     4. No MULTI LOGIN" 
 echo -e "     5. No ILEGAL CONTENT"
-echo -e "     1. No TORENT!
-echo -e "÷÷÷÷÷÷÷÷÷÷÷÷ Tanks - Ary SGDO ÷÷÷÷÷÷÷÷÷÷÷"
-echo -e ""
+echo -e "     6. No TORENT!
+echo -e "==================Tanks=================="
+echo -e "Ary SGDO"
 myip=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0' | head -n1`;
 #echo "Config OVPN (http://$myip/client.tar)" 
 }
