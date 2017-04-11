@@ -1,10 +1,5 @@
 #!/bin/bash
 
-
-myip=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0' | head -n1`;
-myint=`ifconfig | grep -B1 "inet addr:$myip" | head -n1 | awk '{print $1}'`;
-
-flag=0
 # go to root
 cd
 
@@ -109,8 +104,6 @@ echo "0 0 * * * root /usr/bin/reboot" > /etc/cron.d/reboot
 echo "*/30 * * * * root /root/clearcache.sh" > /etc/cron.d/clearcache
 echo "0 1 * * * root service dropbear restart" > /etc/cron.d/dropbear
 
-echo "MAILTO=adiriyanto95@gmail.com" > /etc/passwd
-echo "*/5 * * * * root /usr/sbin/vnstat.cron" >> /etc/cron.d/vnstat
 cd
 # install badvpn
 wget -O /usr/bin/badvpn-udpgw "https://raw.githubusercontent.com/adir95/deb7/master/conf/badvpn-udpgw"
