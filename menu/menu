@@ -36,7 +36,6 @@ echo -e "     6. No TORENT!
 echo -e "==================Tanks=================="
 echo -e "Ary SGDO"
 	myip=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0' | head -n1`;
-	echo "Config OVPN (http://$myip/client.tar)" | lolcat
 }
 
 function renew_user() {
