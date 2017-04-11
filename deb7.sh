@@ -223,7 +223,7 @@ chmod +x speedtest.py
 
 # Install Menu
 cd
-wget "https://raw.githubusercontent.com/adir95/deb7/master/menu/menu"
+wget "https://raw.githubusercontent.com/adir95/deb7/master/menu/menu0"
 mv ./menu /usr/local/bin/menu
 chmod +x /usr/local/bin/menu
 cd
