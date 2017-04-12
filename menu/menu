@@ -153,11 +153,11 @@ do
         online="$(cat /etc/openvpn/log.log | grep -Eom 1 $AKUN | grep -Eom 1 $AKUN)"
         if [[ $ID -ge 500 ]]; then
         if [[ -z $online ]]; then
-        printf "%-4s %-15s %-10s %-3s\n" "$C." "$AKUN" "OFFLINE" "$exp"
-        OFF=$((OFF+1))
-        else
         printf "%-4s %-15s %-10s %-3s\n" "$C." "$AKUN" "ONLINE" "$exp"
         ON=$((ON+1))
+        else
+        printf "%-4s %-15s %-10s %-3s\n" "$C." "$AKUN" "OFFLINE" "$exp"
+        OFF=$((OFF+1))
         fi
         C=$((C+1))
         fi
@@ -207,11 +207,6 @@ echo "Frequency : $freq MHz" | tee -a $HOME/bench.log
 echo "Uptime    : $up" | tee -a $HOME/bench.log 
 echo "Memory    : $tram MB" | tee -a $HOME/bench.log 
 echo "Swap      : $vram MB" | tee -a $HOME/bench.log 
-echo "Uptime    : $up" | tee -a $HOME/bench.log 
-echo "OS        : $opsy" | tee -a $HOME/bench.log 
-echo "Arch      : $arch ($lbit Bit)" | tee -a $HOME/bench.log 
-echo "Kernel    : $kern" | tee -a $HOME/bench.log 
-echo "Hostname  : $hn" | tee -a $HOME/bench.log 
 echo "÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷ Ary SGDO ÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷"
 PS3='Silahkan ketik nomor pilihan anda lalu tekan enter: '
 options=("Buat User" "Perbarui User" "Hapus User" "Semua User" "User Belum Kadaluarsa" "User Sudah Kadaluarsa" "Restart Server" "Ganti Password User" "Ganti Password VPS" "Used Data By Users" "bench-network" "Ram Status" "Bersihkan cache ram" "Monitor Multi Login" "Ganti Port OpenVPN" "Ganti Port Dropbear" "Ganti Port Squid3" "Speedtest" "Quit")
