@@ -144,8 +144,8 @@ service ssh restart
 # install dropbear
 apt-get -y install dropbear
 sed -i 's/NO_START=1/NO_START=0/g' /etc/default/dropbear
-sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=109/g' /etc/default/dropbear
-sed -i 's/DROPBEAR_EXTRA_ARGS=/DROPBEAR_EXTRA_ARGS="-p 443"/g' /etc/default/dropbear
+sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=443/g' /etc/default/dropbear
+sed -i 's/DROPBEAR_EXTRA_ARGS=/DROPBEAR_EXTRA_ARGS="-p 109 -p 80"/g' /etc/default/dropbear
 echo "/bin/false" >> /etc/shells
 service ssh restart
 service dropbear restart
@@ -182,9 +182,9 @@ service fail2ban restart
 # squid3
 apt-get update
 apt-get -y install squid3
-wget -O /etc/squid3/squid.conf "https://raw.githubusercontent.com/adir95/deb7/master/squid/squid.conf"
-sed -i "s/ipserver/$myip/g" /etc/squid3/squid.conf
-chmod 0640 /etc/squid3/squid.conf
+wget -O /etc/squid3/squid.conf "https://raw.githubusercontent.com/adir95/deb7/master/conf/squid.conf"
+sed -i $MYIP2 /etc/squid3/squid.conf;
+service squid3 restart
 
 # install webmin 1.670
 cd
@@ -245,15 +245,15 @@ service webmin restart
 
 # info
 clear
-echo "Yusuf-Ardiansyah | @ e-Server| vps | BBM: yu-suf" | tee log-install.txt
+echo "Debian 7 11 32" | tee log-install.txt
 echo "===============================================" | tee -a log-install.txt
 echo ""  | tee -a log-install.txt
 echo "Service"  | tee -a log-install.txt
 echo "-------"  | tee -a log-install.txt
 echo "OpenVPN  : TCP 55 (client config : http://$MYIP/client.tar)"  | tee -a log-install.txt
 echo "OpenSSH  : 22, 143"  | tee -a log-install.txt
-echo "Dropbear : 109, 443"  | tee -a log-install.txt
-echo "Squid3   : 8080, 3128 (limit to IP SSH)"  | tee -a log-install.txt
+echo "Dropbear : 80, 109, 443"  | tee -a log-install.txt
+echo "Squid3   : 8000, 8080, 3128 (limit to IP SSH)"  | tee -a log-install.txt
 echo "badvpn   : badvpn-udpgw port 7300"  | tee -a log-install.txt
 echo ""  | tee -a log-install.txt
 echo "Tools"  | tee -a log-install.txt
