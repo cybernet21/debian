@@ -169,18 +169,6 @@ echo "--------------------------------------------------"
 }
 
 clear
-echo "        ====================================================="
-echo "        ====================================================="
-echo "        #     [SELAMAT DATANG DI VPS YUSUF ARDIANSYAH]      #"
-echo "        ====================================================="
-echo "        #           WhatsApp     : 082139743432             #"
-echo "        #           Telegram     : e-Server                 #"
-echo "        #           Facebook     : fb.com/t34mh4ck3r        #"
-echo "        #           Pin-BBM      : yu-suf                   #"
-echo "        #                                                   #"
-echo "        #        Copyright © yusuf-ardiansyah™  2017        #"
-echo "        ====================================================="
-echo ""
 # Removing existing bench.log 
 rm -rf $HOME/bench.log 
 # Reading out system information... 
@@ -204,25 +192,27 @@ hn=$( hostname ) # Hostname
 kern=$( uname -r ) 
 # Date of benchmark 
 bdates=$( date )
-echo "Benchmark started on $bdates" | tee -a $HOME/bench.log 
-echo "Full benchmark log: $HOME/bench.log" | tee -a $HOME/bench.log 
-echo "" | tee -a $HOME/bench.log 
 # Output of results 
-echo "System Info" | tee -a $HOME/bench.log 
+echo "÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷"
+echo "System Info VPS Server SG.Vultr" | tee -a $HOME/bench.log 
 echo "-----------" | tee -a $HOME/bench.log 
+echo "Hostname  : $hn" | tee -a $HOME/bench.log 
+echo "OS        : $opsy" | tee -a $HOME/bench.log 
+echo "Arch      : $arch ($lbit Bit)" | tee -a $HOME/bench.log 
+echo "Kernel    : $kern" | tee -a $HOME/bench.log 
+echo "Hostname  : $hn" | tee -a $HOME/bench.log 
 echo "Processor : $cname" | tee -a $HOME/bench.log 
 echo "CPU Cores : $cores" | tee -a $HOME/bench.log 
 echo "Frequency : $freq MHz" | tee -a $HOME/bench.log 
-echo "Memory : $tram MB" | tee -a $HOME/bench.log 
-echo "Swap : $vram MB" | tee -a $HOME/bench.log 
-echo "Uptime : $up" | tee -a $HOME/bench.log 
-echo "" | tee -a $HOME/bench.log 
-echo "OS : $opsy" | tee -a $HOME/bench.log 
-echo "Arch : $arch ($lbit Bit)" | tee -a $HOME/bench.log 
-echo "Kernel : $kern" | tee -a $HOME/bench.log 
-echo "Hostname : $hn" | tee -a $HOME/bench.log 
-echo "" | tee -a $HOME/bench.log 
-echo "" | tee -a $HOME/bench.log 
+echo "Uptime    : $up" | tee -a $HOME/bench.log 
+echo "Memory    : $tram MB" | tee -a $HOME/bench.log 
+echo "Swap      : $vram MB" | tee -a $HOME/bench.log 
+echo "Uptime    : $up" | tee -a $HOME/bench.log 
+echo "OS        : $opsy" | tee -a $HOME/bench.log 
+echo "Arch      : $arch ($lbit Bit)" | tee -a $HOME/bench.log 
+echo "Kernel    : $kern" | tee -a $HOME/bench.log 
+echo "Hostname  : $hn" | tee -a $HOME/bench.log 
+echo "÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷ Ary SGDO ÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷"
 PS3='Silahkan ketik nomor pilihan anda lalu tekan enter: '
 options=("Buat User" "Perbarui User" "Hapus User" "Semua User" "User Belum Kadaluarsa" "User Sudah Kadaluarsa" "Restart Server" "Ganti Password User" "Ganti Password VPS" "Used Data By Users" "bench-network" "Ram Status" "Bersihkan cache ram" "Monitor Multi Login" "Ganti Port OpenVPN" "Ganti Port Dropbear" "Ganti Port Squid3" "Speedtest" "Quit")
 select opt in "${options[@]}"
