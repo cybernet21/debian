@@ -92,9 +92,9 @@ cd /etc/openvpn/
 wget -O /etc/openvpn/1194-client.ovpn "https://raw.githubusercontent.com/adir95/deb7/master/conf/1194-client.conf"
 sed -i $myip2 /etc/openvpn/1194-client.ovpn;
 PASS= `cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 15 | head -n 1`;
-useradd -M -s /bin/false deenie11
-echo "deenie11:$PASS" | chpasswd
-echo "deenie11" > pass.txt
+useradd -M -s /bin/false adi95
+echo "adi95:$PASS" | chpasswd
+echo "adi95" > pass.txt
 echo "$PASS" >> pass.txt
 tar cf client.tar 1194-client.ovpn
 cp client.tar /home/vps/public_html/
@@ -223,7 +223,7 @@ chmod +x speedtest.py
 
 # Install Menu
 cd
-wget "https://raw.githubusercontent.com/adir95/deb7/master/menu/menu0"
+wget "https://raw.githubusercontent.com/adir95/deb7/master/menu/menu"
 mv ./menu /usr/local/bin/menu
 chmod +x /usr/local/bin/menu
 cd
