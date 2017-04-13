@@ -200,7 +200,6 @@ echo "Hostname  : $hn" | tee -a $HOME/bench.log
 echo "OS        : $opsy" | tee -a $HOME/bench.log 
 echo "Arch      : $arch ($lbit Bit)" | tee -a $HOME/bench.log 
 echo "Kernel    : $kern" | tee -a $HOME/bench.log 
-echo "Hostname  : $hn" | tee -a $HOME/bench.log 
 echo "Processor : $cname" | tee -a $HOME/bench.log 
 echo "CPU Cores : $cores" | tee -a $HOME/bench.log 
 echo "Frequency : $freq MHz" | tee -a $HOME/bench.log 
