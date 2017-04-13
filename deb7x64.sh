@@ -178,12 +178,12 @@ service vnstat restart
 #wget https://raw.githubusercontent.com/adir95/deb7/master/clearcache/crontab
 #mv crontab /etc/
 #chmod 644 /etc/crontab
-#clear cache
 
-#cd
-#wget https://raw.githubusercontent.com/adir95/deb7/master/clearcache/clearcache.sh
-#mv clearcache.sh /root/
-#chmod 755 /root/clearcache.sh
+#clear cache
+cd
+wget https://raw.githubusercontent.com/adir95/deb7/master/clearcache/clearcache.sh
+mv clearcache.sh /root/
+chmod 755 /root/clearcache.sh
 
 # speedtest
 cd
