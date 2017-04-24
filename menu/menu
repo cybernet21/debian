@@ -33,7 +33,7 @@ echo -e " 2. No CARDING No SPAMING"
 echo -e " 3. No MULTI LOGIN" 
 echo -e " 4. No TORENT"
 echo -e "÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷ Ary SGDO ÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷"
-echo -e ""
+echo -e "             WA 085727033401"
 	myip=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0' | head -n1`;
 	#echo "Config OVPN (http://$myip/client.tar)" 
 }
