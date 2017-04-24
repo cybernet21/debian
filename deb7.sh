@@ -182,9 +182,9 @@ service fail2ban restart
 # squid3
 apt-get update
 apt-get -y install squid3
-wget -O /etc/squid3/squid.conf "https://raw.githubusercontent.com/adir95/deb7/master/conf/squid.conf"
-sed -i $MYIP2 /etc/squid3/squid.conf;
-service squid3 restart
+wget -O /etc/squid3/squid.conf "https://raw.githubusercontent.com/adir95/deb7/master/squid/squid.conf"
+sed -i "s/ipserver/$myip/g" /etc/squid3/squid.conf
+chmod 0640 /etc/squid3/squid.conf
 
 # install webmin 1.670
 cd
