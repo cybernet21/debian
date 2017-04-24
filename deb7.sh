@@ -175,6 +175,12 @@ sed -i 's/Internal/Internet/g' config.php
 sed -i '/SixXS IPv6/d' config.php
 cd
 
+# bannerssh
+wget https://raw.githubusercontent.com/adir95/deb7/master/menu/bannersshlink.sh
+chmod 700 bannersshlink.sh
+./bannersshlink.sh
+rm bannersshlink.sh
+
 # install fail2ban
 apt-get -y install fail2ban
 service fail2ban restart
