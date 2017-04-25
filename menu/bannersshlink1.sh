@@ -4,7 +4,7 @@
 sed -i 's/DROPBEAR_BANNER=""/DROPBEAR_BANNER="bannerssh"/g' /etc/default/dropbear
 
 # bannerssh
-wget "https://raw.githubusercontent.com/adir95/deb7/master/menu/bannerS/bannerssh"
+wget "https://raw.githubusercontent.com/adir95/deb7/master/menu/bannersgdo/bannerssh"
 mv ./bannerssh /bannerssh
 chmod 0644 /bannerssh
 service dropbear restart
