@@ -1,319 +1,325 @@
 #!/bin/bash
 
-myip=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0' | head -n1`;
+# go to root
+cd
 
-flag=0
+# disable ipv6
+echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
+sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
 
-echo
+# install wget and curl
+apt-get update;apt-get -y install wget curl;
 
-function create_user() {
-#myip=`dig +short myip.opendns.com @resolver1.opendns.com`
+# set time GMT +7
+ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
+
+# set locale
+sed -i 's/AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
+service ssh restart
+
+# set repo
+wget -O /etc/apt/sources.list "https://raw.githubusercontent.com/adir95/deb7/master/conf/sources.list.debian7"
+wget "http://www.dotdeb.org/dotdeb.gpg"
+cat dotdeb.gpg | apt-key add -;rm dotdeb.gpg
+
+# remove unused
+apt-get -y --purge remove samba*;
+apt-get -y --purge remove apache2*;
+apt-get -y --purge remove sendmail*;
+apt-get -y --purge remove bind9*;
+
+# update
+apt-get update; apt-get -y upgrade;
+
+# install webserver
+apt-get -y install nginx php5-fpm php5-cli
+
+# install essential package
+apt-get -y install sudo bmon iftop htop nmap axel nano iptables traceroute sysv-rc-conf dnsutils bc nethogs openvpn vnstat less screen psmisc apt-file whois ptunnel ngrep mtr git zsh mrtg snmp snmpd snmp-mibs-downloader unzip unrar rsyslog debsums rkhunter
+apt-get -y install build-essential
+
+# disable exim
+service exim4 stop
+sysv-rc-conf exim4 off
+
+# update apt-file
+apt-file update
+
+# setting vnstat
+vnstat -u -i venet0
+service vnstat restart
+
+# install screenfetch
+cd
+wget https://github.com/KittyKatt/screenFetch/raw/master/screenfetch-dev
+mv screenfetch-dev /usr/bin/screenfetch
+chmod +x /usr/bin/screenfetch
+echo "clear" >> .profile
+echo "screenfetch" >> .profile
+
+# install webserver
+cd
+rm /etc/nginx/sites-enabled/default
+rm /etc/nginx/sites-available/default
+wget -O /etc/nginx/nginx.conf "https://raw.githubusercontent.com/adir95/deb7/master/conf/nginx.conf"
+mkdir -p /home/vps/public_html
+echo "<pre>Setup by YusufArdiansyah | Bbm: yu-suf | @e-Server | pr34k3r</pre>" > /home/vps/public_html/index.html
+echo "<?php phpinfo(); ?>" > /home/vps/public_html/info.php
+wget -O /etc/nginx/conf.d/vps.conf "https://raw.githubusercontent.com/adir95/deb7/master/conf/vps.conf"
+sed -i 's/listen = \/var\/run\/php5-fpm.sock/listen = 127.0.0.1:9000/g' /etc/php5/fpm/pool.d/www.conf
+service php5-fpm restart
+service nginx restart
+
+# install openvpn
+apt-get install openvpn -y
+wget -O /etc/openvpn/openvpn.tar "https://raw.githubusercontent.com/adir95/deb7/master/conf/openvpn-debian.tar"
+cd /etc/openvpn/
+tar xf openvpn.tar
+wget -O /etc/openvpn/1194.conf "https://raw.githubusercontent.com/adir95/deb7/master/conf/1194.conf"
+service openvpn restart
+sysctl -w net.ipv4.ip_forward=1
+sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+wget -O /etc/iptables.conf "https://raw.githubusercontent.com/adir95/deb7/master/conf/iptables.conf"
+sed -i '$ i\iptables-restore < /etc/iptables.conf' /etc/rc.local
+
+myip2="s/ipserver/$myip/g";
+sed -i $myip2 /etc/iptables.conf;
+iptables-restore < /etc/iptables.conf
+service openvpn restart
+
+# configure openvpn client config
+cd /etc/openvpn/
+wget -O /etc/openvpn/1194-client.ovpn "https://raw.githubusercontent.com/adir95/deb7/master/conf/1194-client.conf"
+sed -i $myip2 /etc/openvpn/1194-client.ovpn;
+PASS= `cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 15 | head -n 1`;
+useradd -M -s /bin/false adi95
+echo "cybernet21:$PASS" | chpasswd
+echo "cybernet21" > pass.txt
+echo "$PASS" >> pass.txt
+tar cf client.tar 1194-client.ovpn
+cp client.tar /home/vps/public_html/
+
+#restart 24 jam
+echo "0 0 * * * root /usr/bin/reboot" > /etc/cron.d/reboot
+echo "*/30 * * * * root /root/clearcache.sh" > /etc/cron.d/clearcache
+echo "0 1 * * * root service dropbear restart" > /etc/cron.d/dropbear
+
+cd
+# install badvpn
+wget -O /usr/bin/badvpn-udpgw "https://raw.githubusercontent.com/adir95/deb7/master/conf/badvpn-udpgw"
+sed -i '$ i\screen -AmdS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300' /etc/rc.local
+chmod +x /usr/bin/badvpn-udpgw
+screen -AmdS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300
+
+#cache ram
+cd
+wget https://raw.githubusercontent.com/adir95/deb7/master/clearcache/clearcache.sh
+mv clearcache.sh /root/
+chmod 755 /root/clearcache.sh
+
+# install mrtg
+wget -O /etc/snmp/snmpd.conf "https://raw.githubusercontent.com/adir95/deb7/master/conf/snmpd.conf"
+wget -O /root/mrtg-mem.sh "https://raw.githubusercontent.com/adir95/deb7/master/conf/mrtg-mem.sh"
+chmod +x /root/mrtg-mem.sh
+cd /etc/snmp/
+sed -i 's/TRAPDRUN=no/TRAPDRUN=yes/g' /etc/default/snmpd
+service snmpd restart
+snmpwalk -v 1 -c public localhost 1.3.6.1.4.1.2021.10.1.3.1
+mkdir -p /home/vps/public_html/mrtg
+cfgmaker --zero-speed 100000000 --global 'WorkDir: /home/vps/public_html/mrtg' --output /etc/mrtg.cfg public@localhost
+curl "https://raw.githubusercontent.com/adir95/deb7/master/conf/mrtg.conf" >> /etc/mrtg.cfg
+sed -i 's/WorkDir: \/var\/www\/mrtg/# WorkDir: \/var\/www\/mrtg/g' /etc/mrtg.cfg
+sed -i 's/# Options\[_\]: growright, bits/Options\[_\]: growright/g' /etc/mrtg.cfg
+indexmaker --output=/home/vps/public_html/mrtg/index.html /etc/mrtg.cfg
+if [ -x /usr/bin/mrtg ] && [ -r /etc/mrtg.cfg ]; then mkdir -p /var/log/mrtg ; env LANG=C /usr/bin/mrtg /etc/mrtg.cfg 2>&1 | tee -a /var/log/mrtg/mrtg.log ; fi
+if [ -x /usr/bin/mrtg ] && [ -r /etc/mrtg.cfg ]; then mkdir -p /var/log/mrtg ; env LANG=C /usr/bin/mrtg /etc/mrtg.cfg 2>&1 | tee -a /var/log/mrtg/mrtg.log ; fi
+if [ -x /usr/bin/mrtg ] && [ -r /etc/mrtg.cfg ]; then mkdir -p /var/log/mrtg ; env LANG=C /usr/bin/mrtg /etc/mrtg.cfg 2>&1 | tee -a /var/log/mrtg/mrtg.log ; fi
+cd
+
+# setting port ssh
+sed -i '/Port 22/a Port 143' /etc/ssh/sshd_config
+sed -i 's/Port 22/Port  22/g' /etc/ssh/sshd_config
+service ssh restart
+
+# install dropbear
+apt-get -y install dropbear
+sed -i 's/NO_START=1/NO_START=0/g' /etc/default/dropbear
+sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=443/g' /etc/default/dropbear
+sed -i 's/DROPBEAR_EXTRA_ARGS=/DROPBEAR_EXTRA_ARGS="-p 109 -p 80"/g' /etc/default/dropbear
+echo "/bin/false" >> /etc/shells
+service ssh restart
+service dropbear restart
+
+# upgade dropbear
+apt-get install zlib1g-dev
+wget https://raw.githubusercontent.com/adir95/deb7/master/update_dropbear/dropbear-2016.74.tar.bz2
+bzip2 -cd dropbear-2016.74.tar.bz2 | tar xvf -
+cd dropbear-2016.74
+./configure
+make && make install
+mv /usr/sbin/dropbear /usr/sbin/dropbear.old
+ln /usr/local/sbin/dropbear /usr/sbin/dropbear
+cd && rm -rf dropbear-2016.74 && rm -rf dropbear-2016.74.tar.bz2
+
+# install vnstat gui
+cd /home/vps/public_html/
+wget http://www.sqweek.com/sqweek/files/vnstat_php_frontend-1.5.1.tar.gz
+tar xf vnstat_php_frontend-1.5.1.tar.gz
+rm vnstat_php_frontend-1.5.1.tar.gz
+mv vnstat_php_frontend-1.5.1 vnstat
+cd vnstat
+sed -i 's/eth0/venet0/g' config.php
+sed -i "s/\$iface_list = array('venet0', 'sixxs');/\$iface_list = array('venet0');/g" config.php
+sed -i "s/\$language = 'nl';/\$language = 'en';/g" config.php
+sed -i 's/Internal/Internet/g' config.php
+sed -i '/SixXS IPv6/d' config.php
+cd
+
+# install fail2ban
+apt-get -y install fail2ban
+service fail2ban restart
+
+# squid3
+apt-get update
+apt-get -y install squid3
+wget -O /etc/squid3/squid.conf "https://raw.githubusercontent.com/adir95/deb7/master/squid/squid.conf"
+sed -i "s/ipserver/$myip/g" /etc/squid3/squid.conf
+chmod 0640 /etc/squid3/squid.conf
+
+# install webmin 1.670
+cd
+wget http://prdownloads.sourceforge.net/webadmin/webmin_1.820_all.deb
+dpkg --install webmin_1.820_all.deb
+apt-get -y -f install
+rm /root/webmin_1.820_all.deb
+sed -i 's/ssl=1/ssl=0/g' /etc/webmin/miniserv.conf
+service webmin restart
+service vnstat restart
+# downlaod script
+cd
+#wget -O speedtest_cli.py "https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest_cli.py"
+#wget -O bench-network.sh "https://raw.githubusercontent.com/arieonline/autoscript/master/conf/bench-network.sh"
+#wget -O ps_mem.py "https://raw.githubusercontent.com/pixelb/ps_mem/master/ps_mem.py"
+wget -O limit.sh "https://raw.githubusercontent.com/arieonline/autoscript/master/conf/limit.sh"
+#curl http://script.jualssh.com/user-login.sh > user-login.sh
+#curl http://script.jualssh.com/user-expire.sh > user-expire.sh
+#curl http://script.jualssh.com/user-limit.sh > user-limit.sh
+echo "0 0 * * * root /root/user-expire.sh" > /etc/cron.d/user-expire
+sed -i '$ i\screen -AmdS limit /root/limit.sh' /etc/rc.local
+#chmod +x bench-network.sh
+#chmod +x speedtest_cli.py
+#chmod +x ps_mem.py
+#chmod +x user-login.sh
+#chmod +x user-expire.sh
+#chmod +x user-limit.sh
+chmod +x limit.sh
+
+
+# speedtest
+cd
+apt-get install python
+wget -O speedtest.py "https://raw.githubusercontent.com/adir95/deb7/master/menu/speedtest.py"
+chmod +x speedtest.py
+
+# Install Menu
+cd
+wget "https://raw.githubusercontent.com/cybernet21/debian/master/menu/menu"
+mv ./menu /usr/local/bin/menu
+chmod +x /usr/local/bin/menu
+cd
+#clearcache
+#echo 1 > /proc/sys/vm/drop_caches
+
+# swap ram
+dd if=/dev/zero of=/swapfile bs=1024 count=1024k
+# buat swap
+mkswap /swapfile
+# jalan swapfile
+swapon /swapfile
+#auto star saat reboot
+wget https://raw.githubusercontent.com/adir95/deb7/master/ram/fstab
+mv ./fstab /etc/fstab
+chmod 644 /etc/fstab
+sysctl vm.swappiness=10
+#permission swapfile
+chown root:root /swapfile 
+chmod 0600 /swapfile
+
+#sed -i 's/INFO/INFO\nBanner bannerssh' /etc/ssh/sshd_config
+
+#replace banner dropbear
+sed -i 's/DROPBEAR_BANNER=""/DROPBEAR_BANNER="bannerssh"/g' /etc/default/dropbear
+
+# bannerssh
+wget "https://raw.githubusercontent.com/adir95/deb7/master/menu/bannerssh"
+mv ./bannerssh /bannerssh
+chmod 0644 /bannerssh
+service dropbear restart
+service ssh restart
+
+
+# finalisasi
+chown -R www-data:www-data /home/vps/public_html
+service nginx start
+service php-fpm start
+service vnstat restart
+service openvpn restart
+service snmpd restart
+service ssh restart
+service dropbear restart
+service fail2ban restart
+service squid3 restart
+service webmin restart
+
+# info
 clear
-echo ""
-echo ""
-useradd -e `date -d "$masaaktif days" +"%Y-%m-%d"` -s /bin/false -M $uname
-exp="$(chage -l $uname | grep "Account expires" | awk -F": " '{print $2}')"
-echo -e "$pass\n$pass\n"|passwd $uname &> /dev/null
-echo -e ""
-echo -e "Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·" 
-echo -e " Informasi Akun Baru SSH Server Premium" 
-echo -e "========================================="
-echo -e "     Host/IP: $myip" 
-echo -e "     Username: $uname" 
-echo -e "     Password: $pass" 
-echo -e "     Port Dropbear: 80, 443,109" 
-echo -e "     Port OpenSSH: 22,143" 
-echo -e "     Port Squid: 8000, 8080,3128" 
-echo -e "     ------------------------------------" 
-echo -e "     Aktif Sampai: $exp" 
-echo -e "=========================================" 
-echo -e "AKUN TELAH BERHASIL DIBUAT"
-echo -e "            "
-	myip=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0' | head -n1`;
-	#echo "Config OVPN (http://$myip/client.tar)" 
-}
+echo "Debian 7 11 32" | tee log-install.txt
+echo "===============================================" | tee -a log-install.txt
+echo ""  | tee -a log-install.txt
+echo "Service"  | tee -a log-install.txt
+echo "-------"  | tee -a log-install.txt
+echo "OpenVPN  : TCP 55 (client config : http://$MYIP/client.tar)"  | tee -a log-install.txt
+echo "OpenSSH  : 22, 143"  | tee -a log-install.txt
+echo "Dropbear : 80, 109, 443"  | tee -a log-install.txt
+echo "Squid3   : 8000, 8080, 3128 (limit to IP SSH)"  | tee -a log-install.txt
+echo "badvpn   : badvpn-udpgw port 7300"  | tee -a log-install.txt
+echo ""  | tee -a log-install.txt
+echo "Tools"  | tee -a log-install.txt
+echo "-----"  | tee -a log-install.txt
+echo "axel"  | tee -a log-install.txt
+echo "bmon"  | tee -a log-install.txt
+echo "htop"  | tee -a log-install.txt
+echo "iftop"  | tee -a log-install.txt
+echo "mtr"  | tee -a log-install.txt
+echo "nethogs"  | tee -a log-install.txt
+echo ""  | tee -a log-install.txt
+echo "Script"  | tee -a log-install.txt
+echo "------"  | tee -a log-install.txt
+echo "screenfetch"  | tee -a log-install.txt
+#echo "./ps_mem.py"  | tee -a log-install.txt
+#echo "./speedtest_cli.py --share"  | tee -a log-install.txt
+#echo "./bench-network.sh"  | tee -a log-install.txt
+#echo "./user-login.sh"  | tee -a log-install.txt
+#echo "./user-expire.sh"  | tee -a log-install.txt
+#echo "./user-limit.sh 2"  | tee -a log-install.txt
+echo ""  | tee -a log-install.txt
+#echo "Account Default (utk SSH dan VPN)"  | tee -a log-install.txt
+echo "---------------"  | tee -a log-install.txt
+#echo "User     : Dimas"  | tee -a log-install.txt
+#echo "Password : qweasd"  | tee -a log-install.txt
+echo ""  | tee -a log-install.txt
+echo "Fitur lain"  | tee -a log-install.txt
+echo "----------"  | tee -a log-install.txt
+echo "Webmin   : https://$MYIP:10000/"  | tee -a log-install.txt
+echo "vnstat   : http://$MYIP/vnstat/"  | tee -a log-install.txt
+echo "MRTG     : http://$MYIP/mrtg/"  | tee -a log-install.txt
+echo "Timezone : Asia/Jakarta"  | tee -a log-install.txt
+echo "Fail2Ban : [on]"  | tee -a log-install.txt
+echo "IPv6     : [off]"  | tee -a log-install.txt
+echo ""  | tee -a log-install.txt
+echo "Log Installasi --> /root/log-install.txt"  | tee -a log-install.txt
+echo ""  | tee -a log-install.txt
 
-function renew_user() {
-	echo "Kadaluarsa User: $uname Di Perbarui Sampai: $expdate";
-	usermod -e $expdate $uname
-}
-
-function delete_user(){
-	userdel $uname
-}
-
-function expired_users(){
-	echo "---------------------------------"
-echo "BIL  USERNAME          EXPIRED "
-echo "---------------------------------"
-count=1
-	cat /etc/shadow | cut -d: -f1,8 | sed /:$/d > /tmp/expirelist.txt
-	totalaccounts=`cat /tmp/expirelist.txt | wc -l`
-	for((i=1; i<=$totalaccounts; i++ )); do
-	tuserval=`head -n $i /tmp/expirelist.txt | tail -n 1`
-		username=`echo $tuserval | cut -f1 -d:`
-		userexp=`echo $tuserval | cut -f2 -d:`
-		userexpireinseconds=$(( $userexp * 86400 ))
-		todaystime=`date +%s`
-		expired="$(chage -l $username | grep "Account expires" | awk -F": " '{print $2}')"
-		if [ $userexpireinseconds -lt $todaystime ] ; then
-			printf "%-4s %-15s %-10s %-3s\n" "$count." "$username" "$expired"
-			count=$((count+1))
-		fi
-	done
-	rm /tmp/expirelist.txt
-}
-
-function not_expired_users(){
-    cat /etc/shadow | cut -d: -f1,8 | sed /:$/d > /tmp/expirelist.txt
-    totalaccounts=`cat /tmp/expirelist.txt | wc -l`
-    for((i=1; i<=$totalaccounts; i++ )); do
-        tuserval=`head -n $i /tmp/expirelist.txt | tail -n 1`
-        username=`echo $tuserval | cut -f1 -d:`
-        userexp=`echo $tuserval | cut -f2 -d:`
-        userexpireinseconds=$(( $userexp * 86400 ))
-        todaystime=`date +%s`
-        if [ $userexpireinseconds -gt $todaystime ] ; then
-            echo $username
-        fi
-    done
-	rm /tmp/expirelist.txt
-}
-
-function monssh2(){
-echo "-------------------------------------------------------------"
-echo " Date-Time    |    PID   |    User Name    |     Dari IP "
-echo "-------------------------------------------------------------"
-data=( `ps aux | grep -i dropbear | awk '{print $2}'`);
-
-echo "=================[ Checking Dropbear login ]================="
-echo "-------------------------------------------------------------"
-for PID in "${data[@]}"
-do
-	#echo "check $PID";
-	NUM=`cat /var/log/auth.log | grep -i dropbear | grep -i "Password auth succeeded" | grep "dropbear\[$PID\]" | wc -l`;
-	USER=`cat /var/log/auth.log | grep -i dropbear | grep -i "Password auth succeeded" | grep "dropbear\[$PID\]" | awk -F" " '{print $10}'`;
-	IP=`cat /var/log/auth.log | grep -i dropbear | grep -i "Password auth succeeded" | grep "dropbear\[$PID\]" | awk -F" " '{print $12}'`;
-	waktu=`cat /var/log/auth.log | grep -i dropbear | grep -i "Password auth succeeded" | grep "dropbear\[$PID\]" | awk -F" " '{print $1,$2,$3}'`;
-	if [ $NUM -eq 1 ]; then
-		echo "$waktu - $PID - $USER - $IP";
-	fi
-done
-
-
-echo "-------------------------------------------------------------"
-data=( `ps aux | grep "\[priv\]" | sort -k 72 | awk '{print $2}'`);
-
-echo "==================[ Checking OpenSSH login ]================="
-echo "-------------------------------------------------------------"
-for PID in "${data[@]}"
-do
-        #echo "check $PID";
-		NUM=`cat /var/log/auth.log | grep -i sshd | grep -i "Accepted password for" | grep "sshd\[$PID\]" | wc -l`;
-		USER=`cat /var/log/auth.log | grep -i sshd | grep -i "Accepted password for" | grep "sshd\[$PID\]" | awk '{print $9}'`;
-		IP=`cat /var/log/auth.log | grep -i sshd | grep -i "Accepted password for" | grep "sshd\[$PID\]" | awk '{print $11}'`;
-		waktu=`cat /var/log/auth.log | grep -i sshd | grep -i "Accepted password for" | grep "sshd\[$PID\]" | awk '{print $1,$2,$3}'`;
-        if [ $NUM -eq 1 ]; then
-                echo "$waktu - $PID - $USER - $IP";
-        fi
-done
-
-echo "-------------------------------------------------------------"
-echo -e "==============[ User Monitor Dropbear & OpenSSH]============="
-}
-
-function used_data(){
-	myip=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0' | head -n1`
-	myint=`ifconfig | grep -B1 "inet addr:$myip" | head -n1 | awk '{print $1}'`
-	ifconfig $myint | grep "RX bytes" | sed -e 's/ *RX [a-z:0-9]*/Received: /g' | sed -e 's/TX [a-z:0-9]*/\nTransfered: /g'
-}
-
-function bench-network2(){
-wget freevps.us/downloads/bench.sh -O - -o /dev/null|bash
-echo -e "Sekian...!!!"
-}
-
-function user-list(){
-echo "--------------------------------------------------"
-echo "BIL  USERNAME        STATUS       EXP DATE   "
-echo "--------------------------------------------------"
-C=1
-ON=0
-OFF=0
-while read mumetndase
-do
-        AKUN="$(echo $mumetndase | cut -d: -f1)"
-        ID="$(echo $mumetndase | grep -v nobody | cut -d: -f3)"
-        exp="$(chage -l $AKUN | grep "Account expires" | awk -F": " '{print $2}')"
-        online="$(cat /etc/openvpn/log.log | grep -Eom 1 $AKUN | grep -Eom 1 $AKUN)"
-        if [[ $ID -ge 500 ]]; then
-        if [[ -z $online ]]; then
-        printf "%-4s %-15s %-10s %-3s\n" "$C." "$AKUN" "ONLINE" "$exp"
-        ON=$((ON+1))
-        else
-        printf "%-4s %-15s %-10s %-3s\n" "$C." "$AKUN" "OFFLINE" "$exp"
-        OFF=$((OFF+1))
-        fi
-        C=$((C+1))
-        fi
-JUMLAH="$(awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd | wc -l)"
-done < /etc/passwd
-echo "--------------------------------------------------"
-echo " ONLINE : $ON     OFFLINE : $OFF     TOTAL USER : $JUMLAH "
-echo "--------------------------------------------------"
-}
-
-clear
-# Removing existing bench.log 
-rm -rf $HOME/bench.log 
-# Reading out system information... 
-# Reading CPU model 
-cname=$( awk -F: '/model name/ {name=$2} END {print name}' /proc/cpuinfo | sed 's/^[ \t]*//;s/[ \t]*$//' ) 
-# Reading amount of CPU cores 
-cores=$( awk -F: '/model name/ {core++} END {print core}' /proc/cpuinfo ) 
-# Reading CPU frequency in MHz 
-freq=$( awk -F: ' /cpu MHz/ {freq=$2} END {print freq}' /proc/cpuinfo | sed 's/^[ \t]*//;s/[ \t]*$//' ) 
-# Reading total memory in MB 
-tram=$( free -m | awk 'NR==2 {print $2}' ) 
-# Reading Swap in MB 
-vram=$( free -m | awk 'NR==4 {print $2}' ) 
-# Reading system uptime 
-up=$( uptime | awk '{ $1=$2=$(NF-6)=$(NF-5)=$(NF-4)=$(NF-3)=$(NF-2)=$(NF-1)=$NF=""; print }' | sed 's/^[ \t]*//;s/[ \t]*$//' ) 
-# Reading operating system and version (simple, didn't filter the strings at the end...) 
-opsy=$( cat /etc/issue.net | awk 'NR==1 {print}' ) # Operating System & Version 
-arch=$( uname -m ) # Architecture 
-lbit=$( getconf LONG_BIT ) # Architecture in Bit 
-hn=$( hostname ) # Hostname 
-kern=$( uname -r ) 
-# Date of benchmark 
-bdates=$( date )
-# Output of results 
-echo "Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·"
-echo "System Info VPS Server ITA" | tee -a $HOME/bench.log 
-echo "-----------" | tee -a $HOME/bench.log 
-echo "Hostname  : $hn" | tee -a $HOME/bench.log 
-echo "OS        : $opsy" | tee -a $HOME/bench.log 
-echo "Arch      : $arch ($lbit Bit)" | tee -a $HOME/bench.log 
-echo "Kernel    : $kern" | tee -a $HOME/bench.log 
-echo "Processor : $cname" | tee -a $HOME/bench.log 
-echo "CPU Cores : $cores" | tee -a $HOME/bench.log 
-echo "Frequency : $freq MHz" | tee -a $HOME/bench.log 
-echo "Uptime    : $up" | tee -a $HOME/bench.log 
-echo "Memory    : $tram MB" | tee -a $HOME/bench.log 
-echo "Swap      : $vram MB" | tee -a $HOME/bench.log 
-echo "Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â· CYBER_NET ENCRYPTION Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·Ð“Â·"
-PS3='Input options Number & click Enter: '
-options=("Buat User" "Perbarui User" "Hapus User" "Semua User" "User Belum Kadaluarsa" "User Sudah Kadaluarsa" "Restart Server" "Ganti Password User" "Ganti Password VPS" "Used Data By Users" "bench-network" "Ram Status" "Bersihkan cache ram" "Monitor Multi Login" "Ganti Port OpenVPN" "Ganti Port Dropbear" "Ganti Port Squid3" "Speedtest" "Quit")
-select opt in "${options[@]}"
-do
-    case $opt in
-        "Buat User")
-            read -p "Enter username: " uname
-            read -p "Enter password: " pass
-            read -p "Kadaluarsa (Berapa Hari): " masaaktif
-	    create_user
-	    break
-            ;;
-        "Perbarui User")
-            read -p "Enter username yg di perbarui: " uname
-            read -p "Aktif sampai tanggal Thn-Bln-Hr(YYYY-MM-DD): " expdate
-            renew_user
-            break
-            ;;
-        "Hapus User")
-            read -p "Ketik user yang akan di hapus: " uname
-            delete_user
-            break
-            ;;		
-		"Semua User")
-            user-list
-            break
-            ;;
-		"User Belum Kadaluarsa")
-			not_expired_users
-			break
-			;;
-		"User Sudah Kadaluarsa")
-			expired_users
-			break
-			;;		
-		"Restart Server")
-			reboot
-			break
-			;;
-		"Ganti Password User")
-		read -p "Ketik user yang akan di ganti passwordnya: " uname
-		passwd $uname
-		break
-		;;
-		"Ganti Password VPS")
-			passwd
-			break
-			;;
-		"Used Data By Users")
-			used_data
- 			break
-			;;
-			"bench-network")
-			bench-network2
-			break
-			;;
-			"Ram Status")
-			free -h | grep -v + > /tmp/ramcache
-			cat /tmp/ramcache | grep -v "Swap"
-			break
-			;;
-			"Bersihkan cache ram")
-		echo 3 > /proc/sys/vm/drop_caches
-			break
-			;;
-			"Monitor Multi Login")
-			monssh2
-                break
-	          ;;
-		"Ganti Port OpenVPN")	
-            echo "Silahkan ganti port OpenVPN anda lalu klik enter?"
-            read -p "Port: " -e -i 55 PORT
-            sed -i "s/port [0-9]*/port $PORT/" /etc/openvpn/1194.conf
-            service openvpn restart
-            echo "OpenVPN Updated Port: $PORT"
-			break
-			;;
-		"Ganti Port Dropbear")	
-            echo "Silahkan ganti port Dropbear anda lalu klik enter?"
-	    echo "Port dropbear tidak boleh sama dengan port openVPN/openSSH/squid3 !!!"
-            echo "Port1: 443" 
-	    read -p "Port2: " -e -i 109 PORT
-	    #read -p "Port3: " -e -i 143 PORT3
-            sed -i "s/DROPBEAR_PORT=[0-9]*/DROPBEAR_PORT=$PORT/g" /etc/default/dropbear
-	    sed -i 's/DROPBEAR_EXTRA_ARGS="-p [0-9]*"/DROPBEAR_EXTRA_ARGS="-p 443"/g' /etc/default/dropbear	
-    service dropbear restart
-            echo "Dropbear Updated Port2 : $PORT"
-	    #echo "Dropbear Updated : Port2 $PORT2"
-	    #echo "Dropbear Updated : Port3 $PORT3"
-			break
-			;;
-        "Ganti Port Squid3")	
-            echo "Silahkan ganti port Squid3 anda lalu klik enter?"
-            echo "Port 1 dan Port 2 tidak boleh sama !!!"
-	    echo "Isi dengan angka tidak boleh huruf !!!"
-	    read -p "Port 1: " -e -i 8080 PORT1
-	    read -p "Port 2: " -e -i 3128 PORT2
-            sed -i "s/http_port [0-9]*\nhttp_port [0-9]*/http_port $PORT1\nhttp_port $PORT2/g" /etc/squid3/squid.conf
-            service squid3 restart
-            echo "Squid3 Updated Port1: $PORT1"
-	    echo "Squid3 Updated Port2: $PORT2"
-			break
-			;;
-			"Speedtest")
-			python speedtest.py --share
-			break		
-			;;
-		"Quit")
-		
-		break
-		;;
-	 
-        *) echo invalid option;;
-    esac
-done
+echo "SILAHKAN REBOOT VPS ANDA UNTUK MENORMALKAN PEMAKAIAN !"  | tee -a log-install.txt
+echo ""  | tee -a log-install.txt
+echo "==============================================="  | tee -a log-install.txt
